@@ -1,0 +1,38 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id    Int    @id @default(autoincrement())
+  name  String
+  email String @unique
+  password String
+
+  games Game[] // Relacionamento com múltiplos jogos
+}
+
+model Game {
+  id       Int       @id @default(autoincrement())
+  name     String    // Nome do jogo (genérico para todos os tipos)
+  userId   Int
+
+  user     User      @relation(fields: [userId], references: [id])
+  gameMemory GameMemory? // Relacionamento opcional com GameMemory
+}
+
+model GameMemory {
+  id        Int     @id @default(autoincrement())
+  playTime  Int     // Tempo de jogo em segundos
+  mainImage String  // URL da imagem principal
+  images    String[] // Array de URLs de imagens
+
+  userId     Int
+  gameId     Int          @relation(fields: [gameId], references: [id])
+
+  Game       Game         @relation(fields: [gameId], references: [id])
+}
